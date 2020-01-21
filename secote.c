@@ -1,9 +1,9 @@
 //src: https://github.com/jumper149/blugon/blob/baf79b5b19f3387b4186fc5dacd31a7c47e22144/backends/scg/scg.c#L1
 //modified to act like: "blugon(v1.11.3) -r -o -b scg" (and/or "-b tty", if not ran inside X)  (where /home/user/.config/blugon/current returns eg. "3000.0" Kelvin - can be passed as arg)
 //so now you can run it like this(kelvin color value):
-// ./a.out 3000
+// ./secote 3000
 //or like this(the equivalent rgb gamma colors for that kelvin value):
-// ./a.out 1.0 0.6949030005552019 0.4310480202110507
+// ./secote 1.0 0.6949030005552019 0.4310480202110507
 // All I needed was something to set color to 3000 Kelvin, instead of all the functionality that blugon provides.
 // note to self: although blugon doesn't exist on Gentoo(and only as AUR on archlinux), there exists something similar(and more well known) (also on archlinux) RedShift https://wiki.gentoo.org/wiki/Redshift and it can set color temperature (just like this very program whose source code you're reading is doing) like this: "$ redshift -P -O 3000" ("-O TEMP  One shot manual mode (set color temperature)" and "-P		Reset existing gamma ramps before applying new color effect")  that assumes "-m randr", for tty/console you should "-m drm"
 #include <X11/Xlib.h>
