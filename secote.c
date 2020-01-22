@@ -16,7 +16,6 @@
 #include <stdio.h>      /* printf */
 #include <inttypes.h>   /* PRIx64 */
 
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
   //#include <float.h>      /* DECIMAL_DIG */
   //^ don't need this anymore!
@@ -31,7 +30,6 @@
 #include <assert.h>     /* assert */
 
 //global only when testing! so it can be accessed from within tty
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
   double kelvin;
 #endif
@@ -67,7 +65,6 @@ static const char COLOR_TABLE[NUM_COLORS][3*2+1] = {
   "ffffff"  //white
 };
 
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
 static const char Kelvin_3000[NUM_COLORS][1+3*2+1] = {
   "0000000",
@@ -126,7 +123,6 @@ void tty_gamma(double r, double g, double b) {
     if (db>255) { db = 255; }
     //note: vararg args are auto-converted to int if they're less than int (thanks TheBeastie on ##c freenode irc)
     printf("\033]P%X%02x%02x%02x", color_num, (int)dr, (int)dg, (int)db);//truncated r,g,b values!
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
     //doneTODO: verify values are correct here for 3000 Kelvin
     if (3000.0 == kelvin) {
@@ -159,7 +155,6 @@ void kelvin_to_gamma(double kelvin, double *gamma_r, double *gamma_g, double *ga
   // Transforms temperature in Kelvin to Gamma values between 0 and 1.
   // src: https://github.com/jumper149/blugon/blob/baf79b5b19f3387b4186fc5dacd31a7c47e22144/blugon.py#L234-L269
   // eg. kelvin 3000.0
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
   double savedkelvin=kelvin;
 #endif
@@ -185,7 +180,6 @@ void kelvin_to_gamma(double kelvin, double *gamma_r, double *gamma_g, double *ga
     *gamma_b = kelvin - 10;
     *gamma_b = 138.5177312231 * log(*gamma_b) - 305.0447927307;
   }
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
   static const int precision=16; //how many digits after the '.' in printf-ing the floats
   printf("before: r=%lf, g=%lf, b=%lf\n", *gamma_r, *gamma_g, *gamma_b); // 255 177.2002651415765 109.91724515381793
@@ -204,7 +198,6 @@ void kelvin_to_gamma(double kelvin, double *gamma_r, double *gamma_g, double *ga
   rgb_to_gamma(*gamma_r, gamma_r);
   rgb_to_gamma(*gamma_g, gamma_g);
   rgb_to_gamma(*gamma_b, gamma_b);
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
   printf("after : r=%lf, g=%lf, b=%lf\n", *gamma_r, *gamma_g, *gamma_b); // 1.0 0.6949030005552019 0.4310480202110507
   //printf("after : r=%.*e, g=%.*e, b=%.*e\n", DECIMAL_DIG, *gamma_r, DECIMAL_DIG, *gamma_g, DECIMAL_DIG, *gamma_b); // 1.0 0.6949030005552019 0.4310480202110507
@@ -220,7 +213,6 @@ void kelvin_to_gamma(double kelvin, double *gamma_r, double *gamma_g, double *ga
 }
 
 int main(int argc, char **argv) {
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
   printf("%s %s\n",
 #ifdef DEBUG
@@ -240,12 +232,10 @@ int main(int argc, char **argv) {
   double gamma_r;
   double gamma_g;
   double gamma_b;
-//#ifdef NONTESTINGRELEASE
 #ifndef APPLY_TESTS
   double kelvin;
 #endif
 
-//#ifndef NONTESTINGRELEASE
 #ifdef APPLY_TESTS
     printf("argc=%d\n", argc);
 #else

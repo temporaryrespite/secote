@@ -35,7 +35,6 @@ echo '-----'
 
 #conclusion: assert works as long as NDEBUG isn't defined, regardless of whether or not DEBUG is!
 
-#gcc "${commonflags[@]}" -DNONTESTINGRELEASE -o "${exefile}" "${cfile}" && "${exefile}" 3000.0 ; echo "exit code=$?"
 gcc "${commonflags[@]}" -o "${exefile}" "${cfile}" && "${exefile}" 3000.0 ; echo "exit code=$?"
 "${exefile}" 2000
 echo '-----'
