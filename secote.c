@@ -6,6 +6,13 @@
 // ./secote 1.0 0.6949030005552019 0.4310480202110507
 // All I needed was something to set color to 3000 Kelvin, instead of all the functionality that blugon provides.
 // note to self: although blugon doesn't exist on Gentoo(and only as AUR on archlinux), there exists something similar(and more well known) (also on archlinux) RedShift https://wiki.gentoo.org/wiki/Redshift and it can set color temperature (just like this very program whose source code you're reading is doing) like this: "$ redshift -P -O 3000" ("-O TEMP  One shot manual mode (set color temperature)" and "-P    Reset existing gamma ramps before applying new color effect")  that assumes "-m randr", for tty/console you should "-m drm"
+#ifdef APPLY_TESTS
+  #ifndef _POSIX_C_SOURCE
+      //#define _POSIX_C_SOURCE >= 199309L  //operator '>=' has no left operand  (if placed at top of this c file, instead of just before the time.h include, which is seen below) - placed at top because other includes will include 'time.h' before our time.h include directive is reached, most likely.
+  #define _POSIX_C_SOURCE 199309L
+  #endif
+#endif
+//XXX all include directives should be placed below:
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xatom.h>
@@ -15,6 +22,13 @@
 #include <math.h>       /* pow */
 #include <stdio.h>      /* printf */
 #include <inttypes.h>   /* PRIx64 */
+#ifdef APPLY_TESTS
+  //#include <unistd.h>     /* usleep */ // not in c99
+  //src: https://github.com/ewsi/dcstad/pull/6/files
+  #include <time.h> /* nanosleep, timespec */ // nanosleep&timespec are not in c99, unless you set _POSIX_C_SOURCE to 199309L (already done at the top) src: https://ubuntuforums.org/showthread.php?t=1146543&p=7200708#post7200708
+  //#include <sys/time.h> /* timespec */ //hmm "The <sys/time.h> header, included by <time.h>, defines various structures related to time and timers." man 3bsd timespec
+  //#include <bits/types/struct_timespec.h> /* timespec */ // #ifdef __USE_GNU  ?
+#endif
 
 #ifdef APPLY_TESTS
   //#include <float.h>      /* DECIMAL_DIG */
@@ -212,6 +226,29 @@ void kelvin_to_gamma(double kelvin, double *gamma_r, double *gamma_g, double *ga
 #endif
 }
 
+// trap code from: https://stackoverflow.com/questions/57715866/have-x11-c-program-compiled-getting-undefined-reference-errors-what-libs-are
+static int trapped_error_code = 0;
+static int (*old_error_handler) (Display *, XErrorEvent *);
+
+static int
+error_handler(Display     *display, XErrorEvent *error) {
+    trapped_error_code = error->error_code;
+    return 0;
+}
+
+void
+trap_errors(void) {
+    trapped_error_code = 0;
+    old_error_handler = XSetErrorHandler(error_handler);
+}
+
+int
+untrap_errors(void) {
+    XSetErrorHandler(old_error_handler);
+    return trapped_error_code;
+}
+
+
 int main(int argc, char **argv) {
 #ifdef APPLY_TESTS
   printf("%s %s\n",
@@ -309,8 +346,23 @@ int main(int argc, char **argv) {
 
     XFree(crtc_gamma);
   }
+#ifdef APPLY_TESTS
+  trap_errors();
+#endif
   XRRFreeScreenResources(res);
   XCloseDisplay(dpy); //calls XSync which calls XFlush
+#ifdef APPLY_TESTS
+  const static struct timespec slp = { 0, 10 * 1000 * 1000};
+//  static struct timespec slp;
+//  slp.tv_sec = 0;
+//  slp.tv_nsec= 10 * 1000 * 1000;
+  //usleep(10000); // implicit declaration of function ‘usleep’; did you mean ‘sleep’?  https://github.com/ewsi/dcstad/issues/5
+  nanosleep(&slp, NULL);
+  if (untrap_errors()) {
+    /* Handle errors */
+    fprintf(stderr, "Errors detected. TODO: handle or report them.\n"); // this isn't reached in our case! even without calling XRRFreeScreenResources but calling XCloseDisplay
+  }
+#endif
   return 0; //returning success
 }
 

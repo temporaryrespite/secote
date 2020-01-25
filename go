@@ -10,6 +10,7 @@ echo "exefile=${exefile}"
 commonflags=(
   #optionals:
   -Wall
+  -Werror
   -ggdb
   "-D_FORTIFY_SOURCE=2"
   "-std=c99"
@@ -21,7 +22,12 @@ commonflags=(
 )
 rm -- "$exefile" 2>/dev/null
 #assert doesn't work for these 2:
-gcc "${commonflags[@]}" -DAPPLY_TESTS -DNDEBUG -DDEBUG -o "${exefile}" "${cfile}" && "${exefile}" 3000.0 ; echo "exit code=$?"
+gcc "${commonflags[@]}" -DAPPLY_TESTS -DNDEBUG -DDEBUG -o "${exefile}" "${cfile}" ; ec="$?"
+if test "$ec" != "0"; then
+  echo "!! Compilation failed, aborting." >&2
+  exit "$ec"
+fi
+"${exefile}" 3000.0 ; echo "exit code=$?"
 echo '-----'
 gcc "${commonflags[@]}" -DAPPLY_TESTS -DNDEBUG -o "${exefile}" "${cfile}" && "${exefile}" 3000.0 ; echo "exit code=$?"
 echo '-----'
