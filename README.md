@@ -13,7 +13,7 @@ Set color temperature to 3000 Kelvin:
 `./secote 3000`  
 `./secote 1 0.6949030005552019 0.4310480202110507`  
   
-If you have redshift, you don't need secote!  
+If you have [redshift](https://github.com/jonls/redshift/), you don't need secote!  
 on X: `redshift -P -O 3000` or `redshift -P -O 3000 -m randr`  
 on tty/drm: `redshift -P -O 3000 -m drm`  
 
